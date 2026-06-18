@@ -1,6 +1,6 @@
 # OTP Dashboard 🔐
 
-A live dashboard that auto-displays the latest OTP codes for **Surfshark VPN**, **Netflix**, and **Booking.com**.
+A live dashboard that auto-displays the latest OTP codes for **Surfshark VPN**, **Netflix**, **Booking.com**, and **NordVPN**.
 
 ## How it works
 
@@ -16,6 +16,7 @@ A live dashboard that auto-displays the latest OTP codes for **Surfshark VPN**, 
 | Surfshark VPN | ✅ Active |
 | Netflix | 🔜 Coming soon |
 | Booking.com | ✅ Active |
+| NordVPN | ✅ Active |
 
 ## Setup
 
