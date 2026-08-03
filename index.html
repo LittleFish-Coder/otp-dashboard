@@ -137,7 +137,8 @@
 
     async function fetchOTP() {
       const stamp = document.getElementById('last-updated');
-      if (ENDPOINT.indexOf('__ENDPOINT__') !== -1 || KEY.indexOf('__KEY__') !== -1) {
+      // 佔位符未被注入時的偵測(用組字串避免 sed 誤傷這行本身)
+      if (ENDPOINT === '__' + 'ENDPOINT' + '__' || KEY === '__' + 'KEY' + '__') {
         stamp.className = 'updated err';
         stamp.textContent = '尚未注入 ENDPOINT / KEY(GitHub 部署後才會生效)';
         return;
