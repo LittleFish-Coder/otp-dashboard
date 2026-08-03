@@ -8,37 +8,50 @@
   <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Sora:wght@300;400;600&display=swap" rel="stylesheet" />
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    body { font-family: 'Sora', sans-serif; background: #0f0f0f; color: #f0f0f0; min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 2rem; }
-    .wrap { width: 100%; max-width: 600px; }
+    body {
+      font-family: 'Sora', sans-serif; background: #0f0f0f; color: #f0f0f0;
+      min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 2rem;
+    }
+    .wrap { width: 100%; max-width: 640px; }
     .header { margin-bottom: 2.5rem; }
     .label { font-size: 12px; letter-spacing: 0.12em; text-transform: uppercase; color: #666; margin-bottom: 8px; }
     .title { font-size: 28px; font-weight: 600; color: #f0f0f0; }
+
     .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px; }
-    .card { background: #1a1a1a; border: 1px solid #2a2a2a; border-radius: 16px; padding: 1.5rem; position: relative; overflow: hidden; }
-    .card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; }
-    .card-surfshark::before { background: #1CBECA; }
-    .card-netflix::before { background: #E50914; }
-    .card-booking::before { background: #003580; }
-    .card-nordvpn::before { background: #4687FF; }
+    .empty { color: #555; font-size: 14px; padding: 2rem 0; text-align: center; }
+
+    /* 卡片的品牌色由 inline 的 --accent 決定,所以不需要為每個平台寫一組 class */
+    .card {
+      background: #1a1a1a; border: 1px solid #2a2a2a; border-radius: 16px;
+      padding: 1.5rem; position: relative; overflow: hidden;
+    }
+    .card::before {
+      content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+      background: var(--accent, #8b5cf6);
+    }
     .service-row { display: flex; align-items: center; gap: 10px; margin-bottom: 1.5rem; }
-    .dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
-    .dot-surfshark { background: #1CBECA; }
-    .dot-netflix { background: #E50914; }
-    .dot-booking { background: #003580; }
-    .dot-nordvpn { background: #4687FF; }
+    .dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; background: var(--accent, #8b5cf6); }
     .service-name { font-size: 12px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: #888; }
-    .badge { margin-left: auto; font-size: 11px; padding: 3px 10px; border-radius: 20px; }
+    .badge { margin-left: auto; font-size: 11px; padding: 3px 10px; border-radius: 20px; white-space: nowrap; }
     .badge-live { background: rgba(34,197,94,0.15); color: #4ade80; }
     .badge-wait { background: #2a2a2a; color: #666; }
-    .otp-code { font-family: 'Space Mono', monospace; font-size: 40px; font-weight: 700; letter-spacing: 0.15em; color: #f0f0f0; margin-bottom: 0.75rem; transition: all 0.3s ease; }
+
+    .otp-code {
+      font-family: 'Space Mono', monospace; font-size: 40px; font-weight: 700;
+      letter-spacing: 0.15em; color: #f0f0f0; margin-bottom: 0.75rem;
+    }
     .otp-code.waiting { color: #333; }
     .otp-code.flicker { animation: flicker 0.5s ease; }
-    .time { font-size: 12px; color: #555; display: flex; align-items: center; gap: 6px; }
+    .time { font-size: 12px; color: #555; }
+
     .pulse { display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: #4ade80; animation: pulse 2s infinite; }
     @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
     @keyframes flicker { 0%,100%{opacity:1} 20%{opacity:0.35} 40%{opacity:1} 60%{opacity:0.25} 80%{opacity:1} }
+
     .footer { margin-top: 2rem; font-size: 12px; color: #444; text-align: center; }
-    .updated { color: #4ade80; font-size: 11px; margin-top: 4px; }
+    .updated { font-size: 11px; margin-top: 4px; }
+    .updated.ok { color: #4ade80; }
+    .updated.err { color: #f87171; }
   </style>
 </head>
 <body>
@@ -47,44 +60,11 @@
       <p class="label">live otp dashboard</p>
       <h1 class="title">Your codes, always fresh.</h1>
     </div>
-    <div class="grid">
-      <div class="card card-surfshark">
-        <div class="service-row">
-          <div class="dot dot-surfshark"></div>
-          <span class="service-name">Surfshark</span>
-          <span class="badge badge-live" id="badge-surfshark"><span class="pulse"></span> live</span>
-        </div>
-        <div class="otp-code" id="code-surfshark">——————</div>
-        <div class="time" id="time-surfshark">loading...</div>
-      </div>
-      <div class="card card-netflix">
-        <div class="service-row">
-          <div class="dot dot-netflix"></div>
-          <span class="service-name">Netflix</span>
-          <span class="badge badge-wait" id="badge-netflix">waiting...</span>
-        </div>
-        <div class="otp-code waiting" id="code-netflix">——————</div>
-        <div class="time" id="time-netflix">no code yet</div>
-      </div>
-      <div class="card card-booking">
-        <div class="service-row">
-          <div class="dot dot-booking"></div>
-          <span class="service-name">Booking.com</span>
-          <span class="badge badge-wait" id="badge-booking">waiting...</span>
-        </div>
-        <div class="otp-code waiting" id="code-booking">——————</div>
-        <div class="time" id="time-booking">no code yet</div>
-      </div>
-      <div class="card card-nordvpn">
-        <div class="service-row">
-          <div class="dot dot-nordvpn"></div>
-          <span class="service-name">NordVPN</span>
-          <span class="badge badge-wait" id="badge-nordvpn">waiting...</span>
-        </div>
-        <div class="otp-code waiting" id="code-nordvpn">——————</div>
-        <div class="time" id="time-nordvpn">no code yet</div>
-      </div>
+
+    <div class="grid" id="grid">
+      <div class="empty">loading...</div>
     </div>
+
     <div class="footer">
       auto-refreshes every 5 seconds
       <div class="updated" id="last-updated"></div>
@@ -92,69 +72,93 @@
   </div>
 
   <script>
-    const GIST_ID = 'a96b8317f1a65a714bf1d43a170e0bd9';
-    const GIST_URL = `https://gist.githubusercontent.com/LittleFish-Coder/${GIST_ID}/raw/otp.json`;
+    // ===================== 設定 =====================
+    // 下面兩個值會在 GitHub Actions 部署時,從 repo Secrets 自動注入,不寫進 repo。
+    // 若要本機測試,暫時把 __ENDPOINT__ / __KEY__ 換成真實值即可(記得別 commit)。
+    const ENDPOINT = '__ENDPOINT__';
+    const KEY = '__KEY__';
+    // ================================================
 
-    function flickerCode(el) {
-      el.classList.remove('flicker');
-      void el.offsetWidth;
-      el.classList.add('flicker');
+    // 各平台的招牌色。沒列到的平台會用預設紫色,不影響顯示。
+    const THEME = {
+      surfshark: '#1CBECA',
+      netflix:   '#E50914',
+      booking:   '#003580',
+      nordvpn:   '#4687FF',
+    };
+    const DEFAULT_ACCENT = '#8b5cf6';
+
+    const prev = {}; // 記住上一輪的 code,用來判斷是否要閃爍
+
+    function fmtTime(iso) {
+      if (!iso) return null;
+      const d = new Date(iso);
+      const p = n => String(n).padStart(2, '0');
+      return `${p(d.getMonth() + 1)}/${p(d.getDate())} ${p(d.getHours())}:${p(d.getMinutes())}:${p(d.getSeconds())}`;
+    }
+
+    function render(providers) {
+      const grid = document.getElementById('grid');
+      const entries = Object.entries(providers || {});
+
+      if (!entries.length) {
+        grid.innerHTML = '<div class="empty">沒有任何 provider,請在 Apps Script 的 PROVIDERS 加一筆</div>';
+        return;
+      }
+
+      grid.innerHTML = entries.map(([id, p]) => {
+        const accent = THEME[id] || DEFAULT_ACCENT;
+        const has = !!p.code;
+        const t = fmtTime(p.time);
+        const badge = has
+          ? '<span class="badge badge-live"><span class="pulse"></span> live</span>'
+          : '<span class="badge badge-wait">waiting...</span>';
+        return `
+          <div class="card" style="--accent:${accent}">
+            <div class="service-row">
+              <div class="dot"></div>
+              <span class="service-name">${p.label || id}</span>
+              ${badge}
+            </div>
+            <div class="otp-code ${has ? '' : 'waiting'}" id="code-${id}">${p.code || '——————'}</div>
+            <div class="time">${has ? '🕐 ' + t : 'no code yet'}</div>
+          </div>`;
+      }).join('');
+
+      // code 有變化才閃爍(第一次載入不閃)
+      entries.forEach(([id, p]) => {
+        if (p.code && prev[id] !== undefined && prev[id] !== p.code) {
+          const el = document.getElementById('code-' + id);
+          if (el) { void el.offsetWidth; el.classList.add('flicker'); }
+        }
+        if (p.code) prev[id] = p.code;
+      });
     }
 
     async function fetchOTP() {
+      const stamp = document.getElementById('last-updated');
+      if (ENDPOINT.indexOf('__ENDPOINT__') !== -1 || KEY.indexOf('__KEY__') !== -1) {
+        stamp.className = 'updated err';
+        stamp.textContent = '尚未注入 ENDPOINT / KEY(GitHub 部署後才會生效)';
+        return;
+      }
       try {
-        const res = await fetch(GIST_URL + '?t=' + Date.now());
+        const res = await fetch(`${ENDPOINT}?key=${encodeURIComponent(KEY)}`);
         const data = await res.json();
 
-        if (data.surfshark) {
-          document.getElementById('code-surfshark').textContent = data.surfshark.code || '——————';
-          document.getElementById('time-surfshark').textContent = '🕐 ' + (data.surfshark.time || '—');
-          document.getElementById('code-surfshark').classList.remove('waiting');
+        if (data.error) {
+          stamp.className = 'updated err';
+          stamp.textContent = 'error: ' + data.error + ' — 檢查 KEY 是否正確';
+          return;
         }
 
-        if (data.netflix) {
-          const code = data.netflix.code;
-          const el = document.getElementById('code-netflix');
-          el.textContent = code || '——————';
-          if (code && code !== '000000') {
-            el.classList.remove('waiting');
-            document.getElementById('badge-netflix').className = 'badge badge-live';
-            document.getElementById('badge-netflix').innerHTML = '<span class="pulse"></span> live';
-          }
-          document.getElementById('time-netflix').textContent = '🕐 ' + (data.netflix.time || 'no code yet');
-        }
-
-        const booking = data.booking || data.booking_com || data['booking.com'];
-        if (booking) {
-          const code = booking.code;
-          const el = document.getElementById('code-booking');
-          el.textContent = code || '——————';
-          flickerCode(el);
-          if (code && code !== '000000') {
-            el.classList.remove('waiting');
-            document.getElementById('badge-booking').className = 'badge badge-live';
-            document.getElementById('badge-booking').innerHTML = '<span class="pulse"></span> live';
-          }
-          document.getElementById('time-booking').textContent = '🕐 ' + (booking.time || 'no code yet');
-        }
-
-        const nordvpn = data.nordvpn || data.nord_vpn || data.nord;
-        if (nordvpn) {
-          const code = nordvpn.code;
-          const el = document.getElementById('code-nordvpn');
-          el.textContent = code || '——————';
-          flickerCode(el);
-          if (code && code !== '000000') {
-            el.classList.remove('waiting');
-            document.getElementById('badge-nordvpn').className = 'badge badge-live';
-            document.getElementById('badge-nordvpn').innerHTML = '<span class="pulse"></span> live';
-          }
-          document.getElementById('time-nordvpn').textContent = '🕐 ' + (nordvpn.time || 'no code yet');
-        }
-
-        document.getElementById('last-updated').textContent = 'last updated: ' + new Date().toLocaleTimeString('zh-TW');
+        render(data.providers);
+        stamp.className = 'updated ok';
+        stamp.textContent = 'last updated: ' + new Date().toLocaleTimeString('zh-TW');
       } catch (e) {
         console.error('fetch failed', e);
+        stamp.className = 'updated err';
+        stamp.textContent = 'fetch failed(可能是 CORS)— 重試中...';
       }
     }
 
